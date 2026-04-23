@@ -2693,6 +2693,463 @@ setInterval(() => {
 // These allow camoufox to be used as a profile backend for OpenClaw's browser tool
 // =============================================================================
 
+function studioHtml(port) {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Camofox Studio</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #08111f;
+        --panel: #0d1728;
+        --panel-2: #12213a;
+        --text: #e8eefc;
+        --muted: #98a8c7;
+        --accent: #64d2ff;
+        --accent-2: #7c8cff;
+        --line: rgba(255,255,255,.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(100,210,255,.15), transparent 35%),
+          radial-gradient(circle at 85% 15%, rgba(124,140,255,.14), transparent 30%),
+          linear-gradient(180deg, #050b14 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 40px 20px 56px;
+      }
+      .hero {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1.4fr .9fr;
+        align-items: start;
+      }
+      .card {
+        background: rgba(13, 23, 40, .88);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        box-shadow: 0 20px 80px rgba(0,0,0,.35);
+        backdrop-filter: blur(12px);
+      }
+      .panel { padding: 24px; }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .16em;
+        color: var(--accent);
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(34px, 6vw, 56px);
+        line-height: .95;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+      }
+      .btn {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+        color: var(--text);
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(100,210,255,.45);
+      }
+      .btn.primary {
+        border-color: rgba(100,210,255,.4);
+        background: linear-gradient(135deg, rgba(100,210,255,.24), rgba(124,140,255,.18));
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+      }
+      .tasks {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+      }
+      .mini {
+        padding: 18px;
+        min-height: 160px;
+      }
+      .task {
+        padding: 18px;
+        min-height: 240px;
+      }
+      .task h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      .task .label {
+        display: inline-block;
+        margin-bottom: 10px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(100,210,255,.14);
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      .task p {
+        margin-bottom: 14px;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+      .page-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .pill {
+        border-radius: 999px;
+        padding: 10px 14px;
+      }
+      .mini h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+      code, pre {
+        font-family: Consolas, "SFMono-Regular", ui-monospace, monospace;
+      }
+      pre {
+        margin: 14px 0 0;
+        padding: 14px;
+        background: rgba(0,0,0,.22);
+        border-radius: 14px;
+        overflow: auto;
+        font-size: 13px;
+        line-height: 1.5;
+        border: 1px solid rgba(255,255,255,.06);
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.08);
+        color: var(--text);
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #fbbf24;
+        box-shadow: 0 0 0 4px rgba(251,191,36,.16);
+      }
+      .ok .dot { background: #34d399; box-shadow: 0 0 0 4px rgba(52,211,153,.16); }
+      .warn .dot { background: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.16); }
+      .error .dot { background: #f87171; box-shadow: 0 0 0 4px rgba(248,113,113,.16); }
+      @media (max-width: 900px) {
+        .hero, .grid, .tasks { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero page active" data-view="home">
+        <div class="card panel">
+          <div class="eyebrow">Camofox Studio</div>
+          <h1>Launch, inspect, and automate the browser.</h1>
+          <p>
+            This local studio is the starting point for consultants and agents.
+            Use the buttons below for quick status, API examples, or the OpenClaw plugin path.
+          </p>
+          <div class="actions">
+            <a class="btn primary" href="/health" target="_blank" rel="noreferrer">Open health</a>
+            <a class="btn" href="/metrics" target="_blank" rel="noreferrer">Open metrics</a>
+            <button class="btn" type="button" onclick="refreshStatus()">Refresh status</button>
+            <button class="btn" type="button" onclick="openView('review')">Check client site</button>
+            <button class="btn" type="button" onclick="openView('evidence')">Capture proof</button>
+            <button class="btn" type="button" onclick="openView('handoff')">Send handoff</button>
+          </div>
+          <div id="status" class="status"><span class="dot"></span><span>Checking studio...</span></div>
+        </div>
+        <div class="card panel">
+          <div class="eyebrow">Consultant Flow</div>
+          <p><strong>1. Check the client site.</strong> Open a tab, load the target site or document, and inspect the page snapshot.</p>
+          <p style="margin-top:10px;"><strong>2. Capture proof.</strong> Save screenshots, downloads, or structured page snapshots for the report.</p>
+          <p style="margin-top:10px;"><strong>3. Resume login.</strong> Import cookies when the work requires an authenticated session.</p>
+          <p style="margin-top:10px;"><strong>4. Send handoff.</strong> Use the browser actions or OpenClaw tools to finish the job.</p>
+          <pre>curl -X POST http://127.0.0.1:${port}/tabs \\
+  -H "Content-Type: application/json" \\
+  -d '{"userId":"agent1","sessionKey":"task1","url":"https://example.com"}'</pre>
+        </div>
+      </section>
+
+      <section class="page card panel active" data-view="home" style="margin-top: 24px;">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Pending tasks</div>
+            <h1 style="font-size: clamp(26px, 4vw, 38px);">What should I do now?</h1>
+          </div>
+          <div class="page-nav">
+            <button class="btn pill primary" type="button" onclick="openView('review')">Check client site</button>
+            <button class="btn pill primary" type="button" onclick="openView('evidence')">Capture proof</button>
+            <button class="btn pill primary" type="button" onclick="openView('login')">Resume login</button>
+            <button class="btn pill primary" type="button" onclick="openView('handoff')">Send handoff</button>
+          </div>
+        </div>
+        <p>Pick the next pending job. The studio will open a focused page with a command you can copy immediately.</p>
+      </section>
+
+      <section class="tasks page active" data-view="home">
+        <div class="card panel task">
+          <div class="label">Check client site</div>
+          <h2>Open the target and inspect it</h2>
+          <p>Use this when you want to see what the page says, confirm what is already uploaded, or check a client's site.</p>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn primary" type="button" onclick="openView('review')">Check client site</button>
+          </div>
+          <pre>curl -X POST http://127.0.0.1:${port}/tabs \\
+  -H "Content-Type: application/json" \\
+  -d '{"userId":"agent1","sessionKey":"review","url":"https://example.com"}'</pre>
+        </div>
+        <div class="card panel task">
+          <div class="label">Capture proof</div>
+          <h2>Take a snapshot or screenshot</h2>
+          <p>Use this when you need a visual record, a page summary, or proof for a report.</p>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn primary" type="button" onclick="openView('evidence')">Capture proof</button>
+          </div>
+          <pre>curl "http://127.0.0.1:${port}/tabs/TAB_ID/snapshot?userId=agent1&includeScreenshot=true"</pre>
+        </div>
+        <div class="card panel task">
+          <div class="label">Resume login</div>
+          <h2>Reuse an authenticated session</h2>
+          <p>Use this when the client already has a browser login and you need Camofox to continue from there.</p>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn primary" type="button" onclick="openView('login')">Resume login</button>
+          </div>
+          <pre>curl -X POST http://127.0.0.1:${port}/sessions/agent1/cookies \\
+  -H "Content-Type: application/json" \\
+  -d '{"cookies":[]}'</pre>
+        </div>
+      </section>
+
+      <section class="grid page active" data-view="home">
+        <div class="card panel mini">
+          <h2>Send handoff</h2>
+          <p>Use this when the job is done and you need a clean packet of evidence to send back.</p>
+          <div class="actions" style="margin-top:14px;">
+            <button class="btn primary" type="button" onclick="openView('handoff')">Send handoff</button>
+          </div>
+        </div>
+        <div class="card panel mini">
+          <h2>OpenClaw setup</h2>
+          <p><code>openclaw plugins install @askjo/camofox-browser</code></p>
+          <p style="margin-top:10px;">Then use the <code>camofox_*</code> tools exposed by the plugin.</p>
+        </div>
+      </section>
+
+      <section class="grid page active" data-view="home">
+        <div class="card panel mini">
+          <h2>What it can do</h2>
+          <p>Stable refs, screenshots, cookie import, search macros, session isolation, and bot-resistant browsing.</p>
+        </div>
+        <div class="card panel mini">
+          <h2>Pending task guide</h2>
+          <p><strong>Check client site</strong> for inspection.</p>
+          <p style="margin-top:10px;"><strong>Capture proof</strong> for screenshots and snapshots.</p>
+          <p style="margin-top:10px;"><strong>Resume login</strong> for authenticated browsing.</p>
+        </div>
+      </section>
+
+      <section class="page card panel" data-view="review">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Check client site</div>
+            <h1 style="font-size: clamp(30px, 5vw, 44px);">Open the target and inspect it</h1>
+          </div>
+          <div class="page-nav">
+            <button class="btn pill" type="button" onclick="openView('home')">Back to hub</button>
+            <button class="btn pill primary" type="button" onclick="copyTask('review')">Copy site check</button>
+          </div>
+        </div>
+        <p>Use this when the consultant needs to open a site, inspect the page, and decide what to do next.</p>
+        <pre>curl -X POST http://127.0.0.1:${port}/tabs \\
+  -H "Content-Type: application/json" \\
+  -d '{"userId":"agent1","sessionKey":"review","url":"https://example.com"}'</pre>
+      </section>
+
+      <section class="page card panel" data-view="evidence">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Capture proof</div>
+            <h1 style="font-size: clamp(30px, 5vw, 44px);">Take a snapshot or screenshot</h1>
+          </div>
+          <div class="page-nav">
+            <button class="btn pill" type="button" onclick="openView('home')">Back to hub</button>
+            <button class="btn pill primary" type="button" onclick="copyTask('evidence')">Copy proof command</button>
+          </div>
+        </div>
+        <p>Use this when you need a visual record, a page summary, or proof for a report.</p>
+        <pre>curl "http://127.0.0.1:${port}/tabs/TAB_ID/snapshot?userId=agent1&includeScreenshot=true"</pre>
+      </section>
+
+      <section class="page card panel" data-view="login">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Resume login</div>
+            <h1 style="font-size: clamp(30px, 5vw, 44px);">Reuse an authenticated session</h1>
+          </div>
+          <div class="page-nav">
+            <button class="btn pill" type="button" onclick="openView('home')">Back to hub</button>
+            <button class="btn pill primary" type="button" onclick="copyTask('login')">Copy login command</button>
+          </div>
+        </div>
+        <p>Use this when the client already has a browser login and you need Camofox to continue from there.</p>
+        <pre>curl -X POST http://127.0.0.1:${port}/sessions/agent1/cookies \\
+  -H "Content-Type: application/json" \\
+  -d '{"cookies":[]}'</pre>
+      </section>
+
+      <section class="page card panel" data-view="handoff">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Send handoff</div>
+            <h1 style="font-size: clamp(30px, 5vw, 44px);">Package evidence for delivery</h1>
+          </div>
+          <div class="page-nav">
+            <button class="btn pill" type="button" onclick="openView('home')">Back to hub</button>
+            <button class="btn pill primary" type="button" onclick="copyTask('handoff')">Copy handoff bundle</button>
+          </div>
+        </div>
+        <p>Use this when the work is done and you need a clean packet of snapshots, downloads, and links to hand back.</p>
+        <pre>curl -X POST http://127.0.0.1:${port}/tabs/TAB_ID/snapshot?userId=agent1&includeScreenshot=true \\
+&& curl "http://127.0.0.1:${port}/tabs/TAB_ID/downloads?userId=agent1&includeData=true" \\
+&& curl "http://127.0.0.1:${port}/tabs/TAB_ID/links?userId=agent1"</pre>
+      </section>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById('status');
+      const example =
+        "curl -X POST http://127.0.0.1:${port}/tabs \\\\\n" +
+        "  -H \\"Content-Type: application/json\\" \\\\\n" +
+        "  -d '{\\"userId\\":\\"agent1\\",\\"sessionKey\\":\\"task1\\",\\"url\\":\\"https://example.com\\"}'";
+
+      async function refreshStatus() {
+        try {
+          const res = await fetch('/health');
+          const data = await res.json();
+          const ok = res.ok && data.status === 'ok';
+          statusEl.className = 'status ' + (ok ? 'ok' : 'warn');
+          statusEl.innerHTML = '<span class="dot"></span><span>' + (ok ? 'Studio ready' : 'Studio starting') + ' - port ${port}</span>';
+        } catch (err) {
+          statusEl.className = 'status error';
+          statusEl.innerHTML = '<span class="dot"></span><span>Studio unavailable</span>';
+        }
+      }
+
+      async function copyExample() {
+        try {
+          await navigator.clipboard.writeText(example);
+          statusEl.className = 'status ok';
+          statusEl.innerHTML = '<span class="dot"></span><span>Example copied to clipboard</span>';
+        } catch (err) {
+          refreshStatus();
+        }
+      }
+
+      const taskExamples = {
+        review:
+          "curl -X POST http://127.0.0.1:${port}/tabs \\\\\n" +
+          "  -H \\"Content-Type: application/json\\" \\\\\n" +
+          "  -d '{\\"userId\\":\\"agent1\\",\\"sessionKey\\":\\"review\\",\\"url\\":\\"https://example.com\\"}'",
+        evidence:
+          "curl \\\"http://127.0.0.1:${port}/tabs/TAB_ID/snapshot?userId=agent1&includeScreenshot=true\\\"",
+        login:
+          "curl -X POST http://127.0.0.1:${port}/sessions/agent1/cookies \\\\\n" +
+          "  -H \\"Content-Type: application/json\\" \\\\\n" +
+          "  -d '{\\"cookies\\":[]}'",
+        handoff:
+          "curl -X POST http://127.0.0.1:${port}/tabs/TAB_ID/snapshot?userId=agent1&includeScreenshot=true \\\\\n" +
+          "&& curl \\\"http://127.0.0.1:${port}/tabs/TAB_ID/downloads?userId=agent1&includeData=true\\\" \\\\\n" +
+          "&& curl \\\"http://127.0.0.1:${port}/tabs/TAB_ID/links?userId=agent1\\\"",
+      };
+
+      async function copyTask(name) {
+        const text = taskExamples[name];
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          statusEl.className = 'status ok';
+          statusEl.innerHTML = '<span class="dot"></span><span>Task example copied</span>';
+        } catch (err) {
+          refreshStatus();
+        }
+      }
+
+      function openView(name) {
+        const target = String(name || 'home');
+        for (const page of document.querySelectorAll('[data-view]')) {
+          page.classList.toggle('active', page.dataset.view === target);
+        }
+        const nextHash = target === 'home' ? '' : '#' + target;
+        if (window.location.hash !== nextHash) {
+          window.location.hash = nextHash;
+        }
+      }
+
+      refreshStatus();
+      openView(window.location.hash.replace('#', '') || 'home');
+      window.addEventListener('hashchange', () => {
+        openView(window.location.hash.replace('#', '') || 'home');
+      });
+      window.refreshStatus = refreshStatus;
+      window.copyExample = copyExample;
+      window.copyTask = copyTask;
+      window.openView = openView;
+    </script>
+  </body>
+</html>`;
+}
+
 // GET / - Status (passive — does not launch browser)
 app.get('/', (req, res) => {
   const running = browser !== null && (browser.isConnected?.() ?? false);
@@ -2704,6 +3161,10 @@ app.get('/', (req, res) => {
     browserConnected: running,
     browserRunning: running,
   });
+});
+
+app.get('/studio', (_req, res) => {
+  res.type('html').send(studioHtml(CONFIG.port));
 });
 
 // GET /tabs - List all tabs (OpenClaw expects this)

@@ -4,6 +4,9 @@
   "description": "Headless browser automation server and OpenClaw plugin for AI agents - anti-detection, element refs, and session isolation",
   "type": "module",
   "main": "server.js",
+  "bin": {
+    "camofox": "./bin/camofox.mjs"
+  },
   "license": "MIT",
   "author": "Jo Inc <oss@askjo.ai>",
   "homepage": "https://github.com/jo-inc/camofox-browser#readme",
@@ -35,6 +38,7 @@
     "node": ">=18"
   },
   "files": [
+    "bin/",
     "server.js",
     "lib/",
     "plugin.ts",
@@ -52,6 +56,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "guide": "node bin/camofox.mjs",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest --runInBand --forceExit",
     "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --runInBand --forceExit tests/e2e",
     "test:live": "RUN_LIVE_TESTS=1 NODE_OPTIONS='--experimental-vm-modules' jest --runInBand --forceExit tests/live",

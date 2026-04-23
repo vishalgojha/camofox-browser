@@ -23,6 +23,31 @@ npm install && npm start
 # → http://localhost:9377
 ```
 
+### Guided Consultant Start
+
+If you want a guided terminal flow instead of jumping straight into the API, use the launcher:
+
+```bash
+npm install -g @askjo/camofox-browser
+camofox
+```
+
+You can also run it without a global install:
+
+```bash
+npx @askjo/camofox-browser
+```
+
+The guided launcher explains what Camofox can do, then lets you:
+
+- start the localhost studio
+- open the browser automatically
+- see the core API calls
+- review OpenClaw setup
+
+The local studio opens at `http://127.0.0.1:9377/studio` by default.
+The home screen now asks `What should I do now?` and shows the pending next steps: `Check client site`, `Capture proof`, `Resume login`, or `Send handoff` without reading the raw API first. Each action opens its own focused page inside the studio.
+
 ---
 
 ## Why
@@ -68,6 +93,16 @@ openclaw plugins install @askjo/camofox-browser
 ```
 
 **Tools:** `camofox_create_tab` · `camofox_snapshot` · `camofox_click` · `camofox_type` · `camofox_navigate` · `camofox_scroll` · `camofox_screenshot` · `camofox_close_tab` · `camofox_list_tabs` · `camofox_import_cookies`
+
+### What the Launcher Teaches
+
+The guided terminal launcher is meant for non-technical users. It gives them a short orientation:
+
+- what the browser server does
+- when to use a tab, a snapshot, or a click command
+- how to open the localhost studio
+- how to call the API directly
+- how to connect OpenClaw if they are using an agent framework
 
 ### Standalone
 
