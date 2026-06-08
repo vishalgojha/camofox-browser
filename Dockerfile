@@ -37,14 +37,15 @@ RUN apt-get update && apt-get install -y \
     # Utils
     ca-certificates \
     unzip \
+    build-essential \
     # yt-dlp runtime dependency
     python3-minimal \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install --production
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
 COPY server.js ./
 COPY lib/ ./lib/
